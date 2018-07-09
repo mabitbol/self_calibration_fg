@@ -1,11 +1,9 @@
 #! /usr/bin/python
 
 import numpy as np
-from numpy import sin, cos, arcsin, exp
 import healpy as hp
-from math import pi
-from astropy.io import fits
-from scipy import optimize
+from numpy import sin, cos, arcsin, exp, pi
+from scipy.optimize import curve_fit
 from show_data import *
 
 r2d = 180./pi
@@ -80,8 +78,8 @@ def extrapolate(ell, dust, errors,  l):
     dustnew = {}
     errorsnew = {}
     for k in dust.keys():
-        Amp, sig = optimize.curve_fit(dustfit, ell, dust[k], p0=dust[k][0], \
-                                        sigma=errors[k], absolute_sigma=True)
+        Amp, sig = curve_fit(dustfit, ell, dust[k], p0=dust[k][0], \
+                             sigma=errors[k], absolute_sigma=True)
         err = np.sqrt(sig[0][0])
         dustnew[k] = dustfit(l, Amp)
         errorsnew[k] = dustfit(l, err)
