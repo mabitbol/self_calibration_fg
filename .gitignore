@@ -1,0 +1,7 @@
+old/
+*.c
+*.so
+*.pyc
+*.pdf
+*.eps
+*.png
