@@ -76,8 +76,8 @@ def plot_likeli(psi_a, L, name, plot_names, params_list):
         #pl.plot(psi_ad, L[i], color=c, linestyle=fmt, label=label_names[i])
         pl.plot(psi_ad, L[i], color=c, label=label_names[i])
         print label_names[i] 
-        print "peak ", psi_ad[L[i]==max(L[i])][0]
-        print "sigma ", calc_sigma(psi_ad, L[i])
+        print "peak ", psi_ad[L[i]==max(L[i])][0] * 60.
+        print "sigma ", calc_sigma(psi_ad, L[i]) * 60.
         
     pl.axvline(x=psi, color='k', label="Input angle")
     #pl.xlim([psi-w, psi+w])
@@ -189,7 +189,10 @@ def setup_calc_naive(ell, cmb, obs, dust, fsky, beam, nl):
 
 def setup_full(ell, fsky, beam, nl):
     window = (hp.sphtfunc.gauss_beam(beam, lmax=ell[-1])**2)[2:]
-    noise = (((ell*(ell+1)/(2*pi))*((pi/10800.)*nl)**2)*1e-12)/window
+    #noise = (((ell*(ell+1)/(2*pi))*((pi/10800.)*nl)**2)*1e-12)/window
+    noise = np.loadtxt('data/N_ell_SA_Pol_Basel_lkneepess_1yrsLF_145GHz.txt')[:, 1]
+    #noise = np.loadtxt('data/N_ell_SA_Pol_Goal_lkneeopt_1yrsLF_145GHz.txt')[:, 1]
+    noise *= (ell*(ell+1)/(2*pi)) *1e-12
     unit = 1./((2*ell+1)*fsky)
     return unit, noise
 
@@ -584,19 +587,19 @@ def run():
     use_full = 0
 
     if True:
-        name = "SO_SAT_test1"
-        num_curves = 2
+        name = "repeatable"
+        num_curves = 3
         psi = 0.0*d2r
         fsky = 0.1
         beam = 17.*arcmin2r
         nodust = 0
-        frac = 0
-        frac_on = 0
-        level = [1, 5]
-        use_full = 1
+        frac = [0.01, 0.1, 0.5]
+        frac_on = 1
+        level = 10
+        use_full = 0
         #nl = [2.1, 3.3]
-        nl = 3.3
-        lmax = 500
+        nl = 5.
+        lmax = 498
 
     if False:
         name = "intfaster"
