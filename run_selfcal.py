@@ -189,7 +189,9 @@ def setup_calc_naive(ell, cmb, obs, dust, fsky, beam, nl):
 
 def setup_full(ell, fsky, beam, nl):
     window = (hp.sphtfunc.gauss_beam(beam, lmax=ell[-1])**2)[2:]
-    noise = (((ell*(ell+1)/(2*pi))*((pi/10800.)*nl)**2)*1e-12)/window
+    #noise = (((ell*(ell+1)/(2*pi))*((pi/10800.)*nl)**2)*1e-12)/window
+    noise = np.loadtxt('data/N_ell_SA_Pol_Basel_lkneepess_1yrsLF_145GHz.txt')[:, 1]
+    noise *= (ell*(ell+1)/(2*pi)) * 1e-12
     unit = 1./((2*ell+1)*fsky)
     return unit, noise
 
