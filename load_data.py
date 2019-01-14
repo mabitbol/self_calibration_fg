@@ -4,18 +4,20 @@ TCMB = 2.725  # Kelvin
 hplanck = 6.626070150e-34  # MKS
 kboltz = 1.380649e-23  # MKS
 
+datadir = '/Users/abitbol/code/self_calibration_fg/data/'
+
+
 def load_cmb():
     # data is Dl in uK^2    
-    fname = 'data/camb_lens_nobb.dat'
-    fdata = np.loadtxt(fname)
+    fdata = np.loadtxt(datadir+'camb_lens_nobb.dat')
     cmb_cls = {}
     cmb_cls['ells'] = fdata[:, 0]
     cmb_cls['TT'] = fdata[:, 1]
     cmb_cls['EE'] = fdata[:, 2]
     cmb_cls['BB'] = fdata[:, 3]
     cmb_cls['TE'] = fdata[:, 4]
-    cmb_cls['TB'] = np.zeros(len(ells))
-    cmb_cls['EB'] = np.zeros(len(ells))
+    cmb_cls['TB'] = np.zeros(len(fdata[:, 0]))
+    cmb_cls['EB'] = np.zeros(len(fdata[:, 0]))
     return cmb_cls
 
 def load_dust(ells, EBfrac=0.03):
@@ -70,10 +72,10 @@ def normed_plaw(ell, alpha):
 
 def load_SO_noise():
     SO_freqs = [ 27.,  39.,  93., 145., 225., 280.]
-    fdata = np.load('../self_calibration_fg/data/SO_calc_mode1-1_SATyrsLF5_fsky0.1_noise_SAT_P.npy')
+    fdata = np.load(datadir+'SO_calc_mode2-1_SATyrsLF1_noise_SAT_P.npy', encoding='bytes')
     SO_ell = fdata[0]
     noise_data = fdata[1]
-    unit = SO_ell * (SO_ell + 1.) / (2. * pi)
+    unit = SO_ell * (SO_ell + 1.) / (2. * np.pi)
     SO_noise = {}
     for k, fs in enumerate(SO_freqs):
         SO_noise[fs] = noise_data[k] * unit
