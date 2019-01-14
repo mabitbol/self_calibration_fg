@@ -5,6 +5,7 @@ import load_data as ld
 
 [TT, EE, BB, TE, TB, EB] = ['TT', 'EE', 'BB', 'TE', 'TB', 'EB']
 SO_freqs = [ 27.,  39.,  93., 145., 225., 280.]
+d2r = np.pi / 180.
 
 def full_rotate_cls(psi, cmb, dust):
     obs={} 
@@ -38,16 +39,12 @@ def prepare_foregrounds(ells, nu):
     # scale synch
     return dust
 
-def prepare_data(psi0_deg=2.):
-    psi0 = psi0_deg * np.pi / 180.
+def prepare_data(psi0_deg=2., nu=145.):
+    psi0 = psi0_deg * d2r
     cmb_cls, so_noise = prepare_cmb_so()
-
-    nu = 145.
     dust = prepare_foregrounds(cmb_cls['ells'], nu*1e9)
-    #eb_var = calc_eb_var(cmb_cls, so_noise[nu], fsky=0.1)
     obs = full_rotate_cls(psi0, cmb_cls, dust)
     eb_var = calc_eb_var(obs, so_noise[nu], fsky=0.1)
-
     return cmb_cls, so_noise, dust, eb_var, obs
 
 def eb_likelihood(psis, cmb, obs, eb_var):
@@ -58,4 +55,17 @@ def eb_likelihood(psis, cmb, obs, eb_var):
         eb_like.append(lnlike)
     return eb_like
 
+def run_self_calibration(psi0_deg, nu=145.):
+    cmb_cls, so_noise, dust, eb_var, obs = prepare_data(psi0_deg=psi0_deg, nu=145.)
+    psis = np.linspace(psi0_deg-.5, psi0_deg+.5, 1000) * d2r
+    eb_like = eb_likelihood(psis, cmb_cls, obs, eb_var)
+    likep = eb_like - np.max(eb_like)
+    bias = psis[np.where(likep == np.max(likep))[0]][0]
+    y = np.cumsum(np.exp(likep))
+    y /= np.max(y)
+    sigma = psis[y>=0.6827][0] - psis[y<=0.3173][-1]
+    return bias, sigma
     
+bias, sigma = run_self_calibration(0)
+print(bias/d2r, sigma/d2r)
+
