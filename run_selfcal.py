@@ -19,11 +19,11 @@ pl.matplotlib.rc('font', size=40)
 pl.matplotlib.rc('figure', autolayout=True)
 pl.matplotlib.rc('axes', edgecolor='0.57')
 pl.matplotlib.rc('grid', color='0.57')
-import healpy as hp
+#import healpy as hp
 from math import pi
 from numpy import sin, cos, arcsin, exp
 from scipy import optimize, integrate
-from load_data import *
+from old_load_data import *
 from show_data import *
 from fast_calc import fast_resid_eb, fast_resid_tb
 
@@ -48,7 +48,7 @@ def plot_likeli(psi_a, L, name, plot_names, params_list):
     norm = mpl.colors.Normalize(-1, N)
     scalar1 = cm.ScalarMappable(norm=norm, cmap=red)
     pl.figure()
-    print name, save_name
+    print(name, save_name)
     for i in range(N):
         #if i==0:
         #    c = 'r'
@@ -75,9 +75,9 @@ def plot_likeli(psi_a, L, name, plot_names, params_list):
         #    fmt = '-'
         #pl.plot(psi_ad, L[i], color=c, linestyle=fmt, label=label_names[i])
         pl.plot(psi_ad, L[i], color=c, label=label_names[i])
-        print label_names[i] 
-        print "peak ", psi_ad[L[i]==max(L[i])][0] * 60.
-        print "sigma ", calc_sigma(psi_ad, L[i]) * 60.
+        print(label_names[i] )
+        print("peak ", psi_ad[L[i]==max(L[i])][0] * 60.)
+        print("sigma ", calc_sigma(psi_ad, L[i]) * 60.)
         
     pl.axvline(x=psi, color='k', label="Input angle")
     #pl.xlim([psi-w, psi+w])
@@ -125,7 +125,7 @@ def make_likelihoods(num_curves, plots, plot_names, params_list):
     w = pi/200
     bounds = [psi-w, psi+w]
     psi_a = np.linspace(bounds[0], bounds[1], endpoint = True, num=num)  
-    print "step size: ", psi_a[1] - psi_a[0]
+    print("step size: ", psi_a[1] - psi_a[0])
     Ltb = []
     Leb = []
     for k in range(num_curves):
@@ -188,7 +188,7 @@ def setup_calc_naive(ell, cmb, obs, dust, fsky, beam, nl):
     return [A,C,dtb], [X,Y,deb]
 
 def setup_full(ell, fsky, beam, nl):
-    window = (hp.sphtfunc.gauss_beam(beam, lmax=ell[-1])**2)[2:]
+    #window = (hp.sphtfunc.gauss_beam(beam, lmax=ell[-1])**2)[2:]
     #noise = (((ell*(ell+1)/(2*pi))*((pi/10800.)*nl)**2)*1e-12)/window
 
     noise = np.loadtxt('data/N_ell_SA_Pol_Basel_lkneepess_1yrsLF_145GHz.txt')[:, 1]
@@ -257,8 +257,8 @@ def full_likeli(psi_a, ell, cmb, obs ,dust, errors, unit, noise):
         #                            args=(p,ell,cmb,obs,amp,sigma,dtb))
     Leb /= max(Leb)
     Ltb /= max(Ltb)
-    print psi_a[Ltb==max(Ltb)][0]*r2d
-    print psi_a[Leb==max(Leb)][0]*r2d
+    print(psi_a[Ltb==max(Ltb)][0]*r2d)
+    print(psi_a[Leb==max(Leb)][0]*r2d)
     return Ltb, Leb
 
 def full_tb_exp(fte, ftb, psi, ell, cmb, obs, amp, sigma, dtb):
@@ -398,7 +398,7 @@ def foo():
 
 def plot_everything(ell, cmb, dust, obs, names):
     #plot_rotations(ell, obs, obs2, dust, "psi2wwo1fracEBTB")
-    print names
+    print(names)
     all_cls(ell, cmb, "cmb", names) 
     all_cls(ell, dust, "dust", names) 
     all_cls(ell, obs, "rotated", names) 
@@ -450,8 +450,8 @@ def fit_r():
     sname = "spuriousB.eps"
     pl.savefig(sname, format='eps')
     #pl.show()
-    print psis*r2d
-    print r
+    #print psis*r2d
+    #print r
     return 
 
 def testcls2():
@@ -460,24 +460,24 @@ def testcls2():
     frac = [.1, .2, .5]
 
     ell, cmb = load_cls()
-    print ell[78]
+    #print ell[78]
     l, dustraw, errorsraw = load_colin_dust(False)
-    print l[0]
-    print "measured EB ", dustraw[EB][0]*uk, errorsraw[EB][0]*uk
-    print "measured TB ", dustraw[TB][0]*uk, errorsraw[TB][0]*uk
+    #print l[0]
+    #print "measured EB ", dustraw[EB][0]*uk, errorsraw[EB][0]*uk
+    #print "measured TB ", dustraw[TB][0]*uk, errorsraw[TB][0]*uk
     dustfit, errorsfit = load_extrap_dust(ell, False)
     dust = mult_cls(dustfit, uk)
     errors = mult_cls(errorsfit, uk)
-    print "level1 EB ", dust[EB][78], errors[EB][78]
-    print "level1 TB ", dust[TB][78], errors[TB][78]
+    #print "level1 EB ", dust[EB][78], errors[EB][78]
+    #print "level1 TB ", dust[TB][78], errors[TB][78]
     dust = mult_cls(dust, 5.)
     errors = mult_cls(errors, 5.)
-    print "level5 EB ", dust[EB][78], errors[EB][78]
-    print "level5 TB ", dust[TB][78], errors[TB][78]
+    #print "level5 EB ", dust[EB][78], errors[EB][78]
+    #print "level5 TB ", dust[TB][78], errors[TB][78]
     dust = mult_cls(dust, 2.)
     errors = mult_cls(errors, 2.)
-    print "level10 EB ", dust[EB][78], errors[EB][78]
-    print "level10 TB ", dust[TB][78], errors[TB][78]
+    #print "level10 EB ", dust[EB][78], errors[EB][78]
+    #print "level10 TB ", dust[TB][78], errors[TB][78]
 
     #dust, errors = frac_dust(dust, errorsfit, 0.01)
     #print "frac.01 EB ", dust[EB][78], errors[EB][78]
