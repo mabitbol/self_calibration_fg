@@ -24,7 +24,7 @@ def load_dust(ells, EBfrac=0.03):
     # At 353 GHz
     alpha_EE = -2.28
     alpha_BB = -2.16
-    A_EE = 34.3 
+    A_EE = 34.3 / 20.
     rA_BB_EE = 0.48
     dust = {}
     dust['EE'] = dustfit(ells, A_EE, alpha_EE)

@@ -28,7 +28,7 @@ def prepare_cmb_so():
 def calc_eb_var(cmb, so_noise, fsky=0.1):
     C_EE_tot = cmb['EE'] + so_noise
     C_BB_tot = cmb['BB'] + so_noise
-    delta_EB_var = 2. / (2. * cmb['ells'] + 1.) * C_EE_tot * C_BB_tot / fsky
+    delta_EB_var = 1. / (2. * cmb['ells'] + 1.) * C_EE_tot * C_BB_tot / fsky
     return delta_EB_var
 
 def prepare_foregrounds(ells, nu):
@@ -44,8 +44,8 @@ def prepare_data(psi0_deg, nu):
     cmb_cls, so_noise = prepare_cmb_so()
     dust = prepare_foregrounds(cmb_cls['ells'], nu*1e9)
     obs = full_rotate_cls(psi0, cmb_cls, dust)
-    eb_var = calc_eb_var(cmb_cls, so_noise[nu])
-    #eb_var = calc_eb_var(obs, so_noise[nu])
+    #eb_var = calc_eb_var(cmb_cls, so_noise[nu])
+    eb_var = calc_eb_var(obs, so_noise[nu])
     return cmb_cls, so_noise, dust, eb_var, obs
 
 def eb_likelihood(psis, cmb, obs, eb_var):
@@ -58,7 +58,7 @@ def eb_likelihood(psis, cmb, obs, eb_var):
 
 def run_self_calibration(psi0_deg, nu=145.):
     cmb_cls, so_noise, dust, eb_var, obs = prepare_data(psi0_deg=psi0_deg, nu=nu)
-    psis = np.linspace(psi0_deg-2., psi0_deg+2., 1000) * d2r
+    psis = np.linspace(psi0_deg-5., psi0_deg+5., 5000) * d2r
     eb_like = eb_likelihood(psis, cmb_cls, obs, eb_var)
     likep = eb_like - np.max(eb_like)
     bias = psis[np.where(likep == np.max(likep))[0]][0]
@@ -67,19 +67,22 @@ def run_self_calibration(psi0_deg, nu=145.):
     sigma = psis[y>=0.6827][0] - psis[y<=0.3173][-1]
     return bias, sigma
     
-print("\Delta\Psi=0")
-for fnu in SO_freqs:
-    bias, sigma = run_self_calibration(0, fnu)
-    print(fnu, bias/d2r, sigma/d2r)
+#x = False
+x = True
+if x:
+    print("\Delta\Psi=0")
+    for fnu in SO_freqs:
+        bias, sigma = run_self_calibration(0, fnu)
+        print(fnu, bias/d2r, sigma/d2r)
 
-print("\Delta\Psi=2")
-for fnu in SO_freqs:
-    bias, sigma = run_self_calibration(2., fnu)
-    print(fnu, bias/d2r-2., sigma/d2r)
+    print("\Delta\Psi=2")
+    for fnu in SO_freqs:
+        bias, sigma = run_self_calibration(2., fnu)
+        print(fnu, bias/d2r-2., sigma/d2r)
 
-print("\Delta\Psi=-2")
-for fnu in SO_freqs:
-    bias, sigma = run_self_calibration(-2., fnu)
-    print(fnu, bias/d2r+2., sigma/d2r)
+    print("\Delta\Psi=-2")
+    for fnu in SO_freqs:
+        bias, sigma = run_self_calibration(-2., fnu)
+        print(fnu, bias/d2r+2., sigma/d2r)
 
 
