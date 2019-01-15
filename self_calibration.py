@@ -18,9 +18,15 @@ def full_rotate_cls(psi, cmb, dust):
     obs[EB]  = 0.5*sin(4*psi)*(cmb[BB]-cmb[EE]+dust[BB]-dust[EE]) + cos(4*psi)*dust[EB]
     return obs
 
-def prepare_cmb_so():
+def prepare_cmb_so(truncate_30=False):
     cmb_cls = ld.load_cmb()
-    so_ell, so_noise = ld.load_SO_noise()
+    so_noise = ld.load_SO_noise()
+    so_ell = so_noise['ells']
+    
+    if truncate_30:
+        so_noise = ld.truncate(so_noise, lmin=200., lmax=so_ell.max())
+        so_ell = so_noise['ells']
+
     cmb_cls = ld.truncate(cmb_cls, lmin=so_ell.min(), lmax=so_ell.max())
     assert np.all(so_ell == cmb_cls['ells'])
     return cmb_cls, so_noise
@@ -32,20 +38,28 @@ def calc_eb_var(cmb, so_noise, fsky=0.1):
     return delta_EB_var
 
 def prepare_foregrounds(ells, nu):
-    dust_353 = ld.load_dust(ells, EBfrac=0.03)
+    dust_353 = ld.load_dust(ells)
     dust = ld.scale_dust(dust_353, nu)
     
-    # load synch 
-    # scale synch
-    return dust
+    synch_2 = ld.load_synch(ells)
+    synch = ld.scale_synch(synch_2, nu)
+    return dust, synch
+
+def make_fgs(dust, synch):
+    fgs = {}
+    for ps in dust:
+        fgs[ps] = dust[ps] + synch[ps]
+    return fgs
 
 def prepare_data(psi0_deg, nu):
     psi0 = psi0_deg * d2r
-    cmb_cls, so_noise = prepare_cmb_so()
-    dust = prepare_foregrounds(cmb_cls['ells'], nu*1e9)
-    obs = full_rotate_cls(psi0, cmb_cls, dust)
-    #eb_var = calc_eb_var(cmb_cls, so_noise[nu])
-    eb_var = calc_eb_var(obs, so_noise[nu])
+    cmb_cls, so_noise = prepare_cmb_so(True)
+
+    dust, synch = prepare_foregrounds(cmb_cls['ells'], nu*1e9)
+    fgs = make_fgs(dust, synch)
+    obs = full_rotate_cls(psi0, cmb_cls, fgs)
+
+    eb_var = calc_eb_var(cmb_cls, so_noise[nu])
     return cmb_cls, so_noise, dust, eb_var, obs
 
 def eb_likelihood(psis, cmb, obs, eb_var):
@@ -64,7 +78,10 @@ def run_self_calibration(psi0_deg, nu=145.):
     bias = psis[np.where(likep == np.max(likep))[0]][0]
     y = np.cumsum(np.exp(likep))
     y /= np.max(y)
-    sigma = psis[y>=0.6827][0] - psis[y<=0.3173][-1]
+    try:
+        sigma = psis[y>=0.6827][0] - psis[y<=0.3173][-1]
+    except:
+        sigma=np.inf
     return bias, sigma
     
 #x = False
@@ -73,16 +90,22 @@ if x:
     print("\Delta\Psi=0")
     for fnu in SO_freqs:
         bias, sigma = run_self_calibration(0, fnu)
-        print(fnu, bias/d2r, sigma/d2r)
+        bias = float("%0.2f" %(bias/d2r))
+        sigma = float("%0.2f" %(sigma/d2r))
+        print(fnu, bias, sigma)
 
     print("\Delta\Psi=2")
     for fnu in SO_freqs:
         bias, sigma = run_self_calibration(2., fnu)
-        print(fnu, bias/d2r-2., sigma/d2r)
+        bias = float("%0.2f" %(bias/d2r-2.))
+        sigma = float("%0.2f" %(sigma/d2r))
+        print(fnu, bias, sigma)
 
     print("\Delta\Psi=-2")
     for fnu in SO_freqs:
         bias, sigma = run_self_calibration(-2., fnu)
-        print(fnu, bias/d2r+2., sigma/d2r)
+        bias = float("%0.2f" %(bias/d2r+2.))
+        sigma = float("%0.2f" %(sigma/d2r))
+        print(fnu, bias, sigma)
 
 
