@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import sin, cos
+from scipy.optimize import curve_fit
 
 import load_data as ld
 
@@ -24,7 +25,7 @@ def prepare_cmb_so(truncate_30=False):
     so_ell = so_noise['ells']
     
     if truncate_30:
-        so_noise = ld.truncate(so_noise, lmin=200., lmax=so_ell.max())
+        so_noise = ld.truncate(so_noise, lmin=30., lmax=so_ell.max())
         so_ell = so_noise['ells']
 
     cmb_cls = ld.truncate(cmb_cls, lmin=so_ell.min(), lmax=so_ell.max())
@@ -70,9 +71,14 @@ def eb_likelihood(psis, cmb, obs, eb_var):
         eb_like.append(lnlike)
     return eb_like
 
+def make_fit(cmb):
+    def eb_fit(ells, psi):
+        return 0.5 * sin(4.*psi) * (cmb['EE'] - cmb['BB'])
+    return eb_fit
+
 def run_self_calibration(psi0_deg, nu=145.):
     cmb_cls, so_noise, dust, eb_var, obs = prepare_data(psi0_deg=psi0_deg, nu=nu)
-    psis = np.linspace(psi0_deg-5., psi0_deg+5., 5000) * d2r
+    psis = np.linspace(psi0_deg-2., psi0_deg+2., 5000) * d2r
     eb_like = eb_likelihood(psis, cmb_cls, obs, eb_var)
     likep = eb_like - np.max(eb_like)
     bias = psis[np.where(likep == np.max(likep))[0]][0]
@@ -83,6 +89,16 @@ def run_self_calibration(psi0_deg, nu=145.):
     except:
         sigma=np.inf
     return bias, sigma
+
+def fit_self_calibration(psi0_deg, nu=145.):
+    cmb_cls, so_noise, dust, eb_var, obs = prepare_data(psi0_deg=psi0_deg, nu=nu)
+    #fitting_function = make_fit(cmb_cls)
+    brange = 2. * d2r
+    bounds = [psi0_deg*d2r - brange, psi0_deg*d2r + brange]
+    popt, cov = curve_fit(make_fit(cmb_cls), cmb_cls['ells'], obs['EB'], sigma=np.sqrt(eb_var), absolute_sigma=True, bounds=bounds)
+    bias = popt[0]
+    sigma = np.sqrt(cov[0][0])
+    return bias, sigma
     
 #x = False
 x = True
@@ -90,6 +106,7 @@ if x:
     print("\Delta\Psi=0")
     for fnu in SO_freqs:
         bias, sigma = run_self_calibration(0, fnu)
+        #bias, sigma = fit_self_calibration(0, fnu)
         bias = float("%0.2f" %(bias/d2r))
         sigma = float("%0.2f" %(sigma/d2r))
         print(fnu, bias, sigma)
@@ -97,6 +114,7 @@ if x:
     print("\Delta\Psi=2")
     for fnu in SO_freqs:
         bias, sigma = run_self_calibration(2., fnu)
+        #bias, sigma = fit_self_calibration(2., fnu)
         bias = float("%0.2f" %(bias/d2r-2.))
         sigma = float("%0.2f" %(sigma/d2r))
         print(fnu, bias, sigma)
@@ -104,6 +122,7 @@ if x:
     print("\Delta\Psi=-2")
     for fnu in SO_freqs:
         bias, sigma = run_self_calibration(-2., fnu)
+        #bias, sigma = fit_self_calibration(-2., fnu)
         bias = float("%0.2f" %(bias/d2r+2.))
         sigma = float("%0.2f" %(sigma/d2r))
         print(fnu, bias, sigma)
