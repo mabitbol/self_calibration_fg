@@ -14,7 +14,7 @@ class SelfCalibrationSO:
         self.prepare_foregrounds()
         return 
 
-    def run_self_calibration(self, psi0, nu):
+    def run_self_calibration(self, psi0_deg, nu):
         psi0 = psi0_deg * d2r
         observed_cls, eb_var = self.preform_observation(psi0, nu)
         
@@ -22,19 +22,19 @@ class SelfCalibrationSO:
         self.calculate_eb_lnlike(observed_cls, eb_var)
         self.get_bias_sigma()
 
-        bias = float("%0.2f" %(bias/d2r - psi0_deg))
-        sigma = float("%0.2f" %(sigma/d2r))
-        print(nu, bias, sigma)
+        bias = float("%0.3f" %(self.bias/d2r - psi0_deg))
+        sigma = float("%0.3f" %(self.sigma/d2r))
+        print("%d GHz: bias=%0.3f, sigma=%0.3f" %(nu, bias, sigma))
         return
 
-    def eb_likelihood(self, obs, eb_var):
+    def calculate_eb_lnlike(self, obs, eb_var):
         # make this a numpy calculation so it is fast. 
         eb_lnlike = []
         for psi in self.xpsis:
             numerator = obs['EB'] + 0.5 * sin(4.*psi) * (self.cmb['EE'] - self.cmb['BB'])
             lnlike = -np.sum(0.5*numerator**2 / eb_var)
             eb_lnlike.append(lnlike)
-        self.eb_lnlike = eb_like
+        self.eb_lnlike = eb_lnlike
         return 
     
     def get_bias_sigma(self):
@@ -43,7 +43,7 @@ class SelfCalibrationSO:
         y = np.cumsum(np.exp(likep))
         y /= np.max(y)
         try:
-            self.sigma = psis[y>=0.6827][0] - psis[y<=0.3173][-1]
+            self.sigma = self.xpsis[y>=0.6827][0] - self.xpsis[y<=0.3173][-1]
         except:
             self.sigma=np.inf
         return 
@@ -59,7 +59,7 @@ class SelfCalibrationSO:
         ellmax = so_noise['ells'].max()
 
         cmb_cls = ld.truncate(cmb_cls, lmin=ellmin, lmax=ellmax)
-        assert np.all(so_ell == cmb_cls['ells'])
+        assert np.all(so_noise['ells'] == cmb_cls['ells'])
         
         self.ells = cmb_cls['ells'] 
         self.cmb = cmb_cls
@@ -79,29 +79,36 @@ class SelfCalibrationSO:
         return 
     
     def preform_observation(self, psi0, nu):
-        fgs = ld.make_fgs(self.dust_353 * self.dust_scaling[nu], self.synch_spass * self.synch_scaling[nu])
+        fgs = ld.make_fgs(self.dust_353, self.dust_scaling[nu], self.synch_spass, self.synch_scaling[nu])
         observed_cls = self.rotate_data(psi0, fgs)
         eb_var = self.calculate_eb_var(observed_cls, self.noise[nu])
         return observed_cls, eb_var
             
-    def rotate_data(self, psi0, fgs):
+    def rotate_data(self, psi, fg):
         cmb = self.cmb
         obs={} 
-        obs[EE] = (sin(2*psi)**2)*(cmb['BB']+fg['BB']) + (cos(2*psi)**2)*(cmb['EE']+fg['EE']) + sin(4*psi)*fg['EB']
-        obs[BB] = (cos(2*psi)**2)*(cmb['BB']+fg['BB']) + (sin(2*psi)**2)*(cmb['EE']+fg['EE']) - sin(4*psi)*fg['EB']
-        obs[EB]  = 0.5*sin(4*psi)*(cmb['BB']-cmb['EE']+fg['BB']-fg['EE']) + cos(4*psi)*fg['EB']
+        obs['EE'] = (sin(2*psi)**2)*(cmb['BB']+fg['BB']) + (cos(2*psi)**2)*(cmb['EE']+fg['EE']) + sin(4*psi)*fg['EB']
+        obs['BB'] = (cos(2*psi)**2)*(cmb['BB']+fg['BB']) + (sin(2*psi)**2)*(cmb['EE']+fg['EE']) - sin(4*psi)*fg['EB']
+        obs['EB']  = 0.5*sin(4*psi)*(cmb['BB']-cmb['EE']+fg['BB']-fg['EE']) + cos(4*psi)*fg['EB']
         return obs
 
     def calculate_eb_var(self, obs, noise, fsky=0.1):
-        C_EE_tot = obs['EE'] + so_noise
-        C_BB_tot = obs['BB'] + so_noise
-        delta_EB_var = 1. / (2. * obs['ells'] + 1.) * C_EE_tot * C_BB_tot / fsky
+        C_EE_tot = obs['EE'] + noise
+        C_BB_tot = obs['BB'] + noise
+        delta_EB_var = 1. / (2. * self.ells + 1.) * C_EE_tot * C_BB_tot / fsky
         return delta_EB_var
             
 
 selfcalibration = SelfCalibrationSO()
+print("Input \Delta\Psi = 0 degrees")
 for nu in selfcalibration.so_freqs:
     selfcalibration.run_self_calibration(0, nu)
+print("Input \Delta\Psi = -2 degrees")
+for nu in selfcalibration.so_freqs:
+    selfcalibration.run_self_calibration(-2, nu)
+print("Input \Delta\Psi = +2 degrees")
+for nu in selfcalibration.so_freqs:
+    selfcalibration.run_self_calibration(2, nu)
 
 """
 def make_fit(cmb):

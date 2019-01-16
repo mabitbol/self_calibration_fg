@@ -97,10 +97,10 @@ def normed_cmb_thermo_units(nu):
     eX = np.exp(X)
     return eX * X**4 / (eX - 1.)**2 
 
-def make_fgs(dust, synch):
+def make_fgs(dust, dust_scaling,  synch, synch_scaling):
     fgs = {}
     for ps in dust:
-        fgs[ps] = dust[ps] + synch[ps]
+        fgs[ps] = dust[ps] * dust_scaling + synch[ps] * synch_scaling
     return fgs
 
 
