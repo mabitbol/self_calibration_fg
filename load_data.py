@@ -4,18 +4,13 @@ TCMB = 2.725  # Kelvin
 hplanck = 6.626070150e-34  # MKS
 kboltz = 1.380649e-23  # MKS
 
-datadir = '/Users/abitbol/code/self_calibration_fg/data/'
-
-def truncate(data, lmin, lmax):
-    mask = (data['ells'] >= lmin) * (data['ells'] <= lmax)
-    ndata = {} 
-    for ps in data:
-        ndata[ps] = data[ps][mask]
-    return ndata
+#datadir = '/Users/abitbol/code/self_calibration_fg/data/'
+datadir = 'data/'
 
 def load_SO_noise():
     SO_freqs = [ 27.,  39.,  93., 145., 225., 280.]
-    fdata = np.load(datadir+'SO_calc_mode2-1_SATyrsLF1_noise_SAT_P.npy', encoding='bytes')
+    #fdata = np.load(datadir+'SO_calc_mode2-1_SATyrsLF1_noise_SAT_P.npy', encoding='bytes')
+    fdata = np.load(datadir+'SO_calc_mode2-1_SATyrsLF5_fsky0.1_noise_SAT_P.npy')
     SO_ell = fdata[0]
     noise_data = fdata[1]
     unit = SO_ell * (SO_ell + 1.) / (2. * np.pi)
@@ -37,6 +32,13 @@ def load_cmb():
     cmb_cls['TB'] = np.zeros(len(fdata[:, 0]))
     cmb_cls['EB'] = np.zeros(len(fdata[:, 0]))
     return cmb_cls
+
+def truncate(data, lmin, lmax):
+    mask = (data['ells'] >= lmin) * (data['ells'] <= lmax)
+    ndata = {} 
+    for ps in data:
+        ndata[ps] = data[ps][mask]
+    return ndata
 
 def load_dust(ells, m=1., EBfrac=0.03):
     # At 353 GHz
@@ -71,19 +73,13 @@ def synchfit(ell, As, Ap, alpha):
     unit = ell * (ell + 1.) / (2. * np.pi)
     return (As * (ell / 80.)**alpha + Ap) * unit
 
-def scale_dust(dust, nu):
-    ndust = {}
-    for ps in dust:
-        unit = normed_dust(nu) * normed_cmb_thermo_units(353.e9) / normed_cmb_thermo_units(nu) 
-        ndust[ps] = dust[ps] * unit**2
-    return ndust
+def scale_dust(nu):
+    unit = normed_dust(nu) * normed_cmb_thermo_units(353.e9) / normed_cmb_thermo_units(nu) 
+    return unit**2
 
-def scale_synch(synch, nu):
-    nsynch = {}
-    for ps in synch:
-        unit = normed_synch(nu) * normed_cmb_thermo_units(2.3e9) / normed_cmb_thermo_units(nu) 
-        nsynch[ps] = synch[ps] * unit**2
-    return nsynch
+def scale_synch(nu):
+    unit = normed_synch(nu) * normed_cmb_thermo_units(2.3e9) / normed_cmb_thermo_units(nu) 
+    return unit**2
 
 def normed_dust(nu, beta=1.53):
     Td = 19.6 
@@ -92,14 +88,20 @@ def normed_dust(nu, beta=1.53):
     X0 = hplanck * nu0 / (kboltz * Td)
     return (nu/nu0)**(3.+beta) * (np.exp(X0) - 1.) / (np.exp(X) - 1.)
 
+def normed_synch(nu, beta=-3.2):
+    nu0 = 2.3e9
+    return (nu/nu0)**(2.+beta)
+
 def normed_cmb_thermo_units(nu):
     X = hplanck * nu / (kboltz * TCMB)
     eX = np.exp(X)
     return eX * X**4 / (eX - 1.)**2 
 
-def normed_synch(nu, beta=-3.2):
-    nu0 = 2.3e9
-    return (nu/nu0)**(2.+beta)
+def make_fgs(dust, synch):
+    fgs = {}
+    for ps in dust:
+        fgs[ps] = dust[ps] + synch[ps]
+    return fgs
 
 
 
