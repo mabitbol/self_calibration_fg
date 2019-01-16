@@ -5,5 +5,4 @@ old/
 *.pdf
 *.eps
 *.png
-*.npy
-SO*
+SO_Noise*.py
