@@ -47,14 +47,15 @@ class SelfCalibrationSO:
             self.sigma = self.xpsis[y>=0.6827][0] - self.xpsis[y<=0.3173][-1]
         except:
             self.sigma=np.inf
-        if np.abs(self.bias) >= np.diff(self.xpsis)[0]:
-            print("Psi resolution not fine enough to resolve bias.")
-        if self.sigma >= np.diff(self.xpsis)[0]:
-            print("Psi resolution not fine enough to calculate sigma! Potentially bad sigma.")
-        if (self.bias + self.sigma) > np.max(self.xpsis):
-            print("Psi array not wide enough for bias and sigma! Potentially bad! (1)")
-        if (self.bias - self.sigma) > np.min(self.xpsis):
-            print("Psi array not wide enough for bias and sigma! Potentially bad! (2)")
+        if False:
+            if np.abs(self.bias) >= np.diff(self.xpsis)[0]:
+                print("Psi resolution not fine enough to resolve bias.")
+            if self.sigma >= np.diff(self.xpsis)[0]:
+                print("Psi resolution not fine enough to calculate sigma! Potentially bad sigma.")
+            if (self.bias + self.sigma) > np.max(self.xpsis):
+                print("Psi array not wide enough for bias and sigma! Potentially bad! (1)")
+            if (self.bias - self.sigma) > np.min(self.xpsis):
+                print("Psi array not wide enough for bias and sigma! Potentially bad! (2)")
         return 
         
     def prepare_cmb_so(self, low_ell_cut):
@@ -109,16 +110,18 @@ class SelfCalibrationSO:
             
 
 
-#selfcalibration = SelfCalibrationSO()
-#print("Input \Delta\Psi = 0 degrees")
-#for nu in selfcalibration.so_freqs:
-#    selfcalibration.run_self_calibration(0, nu)
+selfcalibration = SelfCalibrationSO()
+print("CMB Only")
+print("Input \Delta\Psi = 0 degrees")
+for nu in selfcalibration.so_freqs:
+    selfcalibration.run_self_calibration(0, nu, True)
+
 #print("Input \Delta\Psi = -2 degrees")
 #for nu in selfcalibration.so_freqs:
-#    selfcalibration.run_self_calibration(-2, nu)
+#    selfcalibration.run_self_calibration(-2, nu, True)
 #print("Input \Delta\Psi = +2 degrees")
 #for nu in selfcalibration.so_freqs:
-#    selfcalibration.run_self_calibration(2, nu)
+#    selfcalibration.run_self_calibration(2, nu, True)
 
 
 
