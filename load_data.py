@@ -5,7 +5,7 @@ hplanck = 6.626070150e-34  # MKS
 kboltz = 1.380649e-23  # MKS
 
 #datadir = '/Users/abitbol/code/self_calibration_fg/data/'
-datadir = 'data/'
+datadir = '/Users/m/Projects/self_calibration_fg/data/'
 
 def load_SO_noise():
     SO_freqs = [ 27.,  39.,  93., 145., 225., 280.]

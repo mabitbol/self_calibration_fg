@@ -99,16 +99,20 @@ class SelfCalibrationSO:
         return delta_EB_var
             
 
-selfcalibration = SelfCalibrationSO()
-print("Input \Delta\Psi = 0 degrees")
-for nu in selfcalibration.so_freqs:
-    selfcalibration.run_self_calibration(0, nu)
-print("Input \Delta\Psi = -2 degrees")
-for nu in selfcalibration.so_freqs:
-    selfcalibration.run_self_calibration(-2, nu)
-print("Input \Delta\Psi = +2 degrees")
-for nu in selfcalibration.so_freqs:
-    selfcalibration.run_self_calibration(2, nu)
+
+#selfcalibration = SelfCalibrationSO()
+#print("Input \Delta\Psi = 0 degrees")
+#for nu in selfcalibration.so_freqs:
+#    selfcalibration.run_self_calibration(0, nu)
+#print("Input \Delta\Psi = -2 degrees")
+#for nu in selfcalibration.so_freqs:
+#    selfcalibration.run_self_calibration(-2, nu)
+#print("Input \Delta\Psi = +2 degrees")
+#for nu in selfcalibration.so_freqs:
+#    selfcalibration.run_self_calibration(2, nu)
+
+
+
 
 """
 def make_fit(cmb):
