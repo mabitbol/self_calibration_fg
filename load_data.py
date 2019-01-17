@@ -10,7 +10,7 @@ datadir = '/Users/m/Projects/self_calibration_fg/data/'
 def load_SO_noise():
     SO_freqs = [ 27.,  39.,  93., 145., 225., 280.]
     #fdata = np.load(datadir+'SO_calc_mode2-1_SATyrsLF1_noise_SAT_P.npy', encoding='bytes')
-    fdata = np.load(datadir+'SO_calc_mode2-1_SATyrsLF5_fsky0.1_noise_SAT_P.npy')
+    fdata = np.load(datadir+'SO_calc_mode2-1_SATyrsLF1_fsky0.1_noise_SAT_P.npy')
     SO_ell = fdata[0]
     noise_data = fdata[1]
     unit = SO_ell * (SO_ell + 1.) / (2. * np.pi)
@@ -102,6 +102,5 @@ def make_fgs(dust, dust_scaling,  synch, synch_scaling):
     for ps in dust:
         fgs[ps] = dust[ps] * dust_scaling + synch[ps] * synch_scaling
     return fgs
-
 
 

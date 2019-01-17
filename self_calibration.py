@@ -14,17 +14,18 @@ class SelfCalibrationSO:
         self.prepare_foregrounds()
         return 
 
-    def run_self_calibration(self, psi0_deg, nu):
+    def run_self_calibration(self, psi0_deg, nu, doprint=False):
         psi0 = psi0_deg * d2r
         observed_cls, eb_var = self.preform_observation(psi0, nu)
         
-        self.xpsis = np.linspace(psi0_deg-3., psi0_deg+3., 10000) * d2r
+        self.xpsis = np.linspace(psi0_deg-5., psi0_deg+5., 100000) * d2r
         self.calculate_eb_lnlike(observed_cls, eb_var)
         self.get_bias_sigma()
 
-        bias = float("%0.3f" %(self.bias/d2r - psi0_deg))
-        sigma = float("%0.3f" %(self.sigma/d2r))
-        print("%d GHz: bias=%0.3f, sigma=%0.3f" %(nu, bias, sigma))
+        if doprint:
+            bias = float("%0.3f" %(self.bias/d2r - psi0_deg))
+            sigma = float("%0.3f" %(self.sigma/d2r))
+            print("%d GHz: bias=%0.3f, sigma=%0.3f" %(nu, bias, sigma))
         return
 
     def calculate_eb_lnlike(self, obs, eb_var):
@@ -46,6 +47,14 @@ class SelfCalibrationSO:
             self.sigma = self.xpsis[y>=0.6827][0] - self.xpsis[y<=0.3173][-1]
         except:
             self.sigma=np.inf
+        if np.abs(self.bias) >= np.diff(self.xpsis)[0]:
+            print("Psi resolution not fine enough to resolve bias.")
+        if self.sigma >= np.diff(self.xpsis)[0]:
+            print("Psi resolution not fine enough to calculate sigma! Potentially bad sigma.")
+        if (self.bias + self.sigma) > np.max(self.xpsis):
+            print("Psi array not wide enough for bias and sigma! Potentially bad! (1)")
+        if (self.bias - self.sigma) > np.min(self.xpsis):
+            print("Psi array not wide enough for bias and sigma! Potentially bad! (2)")
         return 
         
     def prepare_cmb_so(self, low_ell_cut):
