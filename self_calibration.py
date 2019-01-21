@@ -1,6 +1,5 @@
 import numpy as np
 from numpy import sin, cos
-from scipy.optimize import curve_fit
 
 import load_data as ld
 d2r = np.pi / 180.
@@ -125,23 +124,6 @@ for nu in selfcalibration.so_freqs:
 
 
 
-
-"""
-def make_fit(cmb):
-    def eb_fit(ells, psi):
-        return 0.5 * sin(4.*psi) * (cmb['EE'] - cmb['BB'])
-    return eb_fit
-
-def fit_self_calibration(psi0_deg, nu=145.):
-    cmb_cls, so_noise, dust, eb_var, obs = prepare_data(psi0_deg=psi0_deg, nu=nu)
-    #fitting_function = make_fit(cmb_cls)
-    brange = 2. * d2r
-    bounds = [psi0_deg*d2r - brange, psi0_deg*d2r + brange]
-    popt, cov = curve_fit(make_fit(cmb_cls), cmb_cls['ells'], obs['EB'], sigma=np.sqrt(eb_var), absolute_sigma=True, bounds=bounds)
-    bias = popt[0]
-    sigma = np.sqrt(cov[0][0])
-    return bias, sigma
-"""
 
 
 
