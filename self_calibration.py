@@ -28,7 +28,6 @@ class SelfCalibrationSO:
         return
 
     def calculate_eb_lnlike(self, obs, eb_var):
-        # make this a numpy calculation so it is fast. 
         eb_lnlike = []
         for psi in self.xpsis:
             numerator = obs['EB'] + 0.5 * sin(4.*psi) * (self.cmb['EE'] - self.cmb['BB'])
@@ -110,7 +109,6 @@ class SelfCalibrationSO:
 
 
 selfcalibration = SelfCalibrationSO()
-print("CMB Only")
 print("Input \Delta\Psi = 0 degrees")
 for nu in selfcalibration.so_freqs:
     selfcalibration.run_self_calibration(0, nu, True)
