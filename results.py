@@ -1,19 +1,27 @@
 from self_calibration import SelfCalibrationSO
 
-#datadir = '/Users/abitbol/code/self_calibration_fg/data/'
-datadir = '/Users/m/Projects/self_calibration_fg/data/'
+# mode 1 baseline
+# mode 2 goal
 
-#fdata = np.load(datadir+'SO_calc_mode2-1_SATyrsLF1_noise_SAT_P.npy', encoding='bytes')
-#fdata = np.load(datadir+'SO_calc_mode2-1_SATyrsLF1_fsky0.1_noise_SAT_P.npy')
+fnames = ['./data/SAT_default_noise_optimistic_mode1.npy', 
+          './data/SAT_default_noise_optimistic_mode2.npy', 
+          './data/LAT_default_P_noise_mode1.npy',
+          './data/LAT_default_P_noise_mode2.npy']
 
-selfcalibration = SelfCalibrationSO()
-print("Input \Delta\Psi = 0 degrees")
-for nu in selfcalibration.so_freqs:
-    selfcalibration.run_self_calibration(0, nu, True)
+for fname in fnames:
+    selfcalibration = SelfCalibrationSO(fname)
+    print(fname)
+    print("Input \Delta\Psi = 0 degrees")
+    for nu in selfcalibration.so_freqs:
+        selfcalibration.run_self_calibration(0, nu, True)
+    print()
 
-#print("Input \Delta\Psi = -2 degrees")
-#for nu in selfcalibration.so_freqs:
-#    selfcalibration.run_self_calibration(-2, nu, True)
-#print("Input \Delta\Psi = +2 degrees")
-#for nu in selfcalibration.so_freqs:
-#    selfcalibration.run_self_calibration(2, nu, True)
+    print("Input \Delta\Psi = -2 degrees")
+    for nu in selfcalibration.so_freqs:
+        selfcalibration.run_self_calibration(-2, nu, True)
+    print()
+
+    print("Input \Delta\Psi = +2 degrees")
+    for nu in selfcalibration.so_freqs:
+        selfcalibration.run_self_calibration(2, nu, True)
+    print()
