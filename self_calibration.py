@@ -13,9 +13,9 @@ class SelfCalibrationSO:
         self.prepare_foregrounds()
         return
 
-    def run_self_calibration(self, psi0_deg, nu, doprint=False):
+    def run_self_calibration(self, psi0_deg, nu, doprint=False, fsky=0.1):
         psi0 = psi0_deg * d2r
-        observed_cls, eb_var = self.preform_observation(psi0, nu)
+        observed_cls, eb_var = self.preform_observation(psi0, nu, fsky)
 
         self.xpsis = np.linspace(psi0_deg-5., psi0_deg+5., 100000) * d2r
         self.calculate_eb_lnlike(observed_cls, eb_var)
@@ -88,11 +88,11 @@ class SelfCalibrationSO:
             self.synch_scaling[nu] = ld.scale_synch(freq)
         return
 
-    def preform_observation(self, psi0, nu):
+    def preform_observation(self, psi0, nu, fsky):
         fgs = ld.make_fgs(self.dust_353, self.dust_scaling[nu], \
                             self.synch_spass, self.synch_scaling[nu])
         observed_cls = self.rotate_data(psi0, fgs)
-        eb_var = self.calculate_eb_var(observed_cls, self.noise[nu])
+        eb_var = self.calculate_eb_var(observed_cls, self.noise[nu], fsky)
         return observed_cls, eb_var
 
     def rotate_data(self, psi, fg):

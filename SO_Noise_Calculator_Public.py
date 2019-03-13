@@ -242,13 +242,13 @@ N_UHF=2.
 ellmax=1e4
 
 ell, N_ell_LA_T, N_ell_LA_Pol, WN_levels = Simons_Observatory_V3_LA_noise(mode, fsky, ellmax, 1, N_LF, N_MF, N_UHF)
-np.save('LAT_default_T_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_T])
-np.save('LAT_default_P_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_Pol])
+#np.save('LAT_default_T_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_T])
+#np.save('LAT_default_P_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_Pol])
 
 mode=1 # goal sensitivity
 ell, N_ell_LA_T, N_ell_LA_Pol, WN_levels = Simons_Observatory_V3_LA_noise(mode, fsky, ellmax, 1, N_LF, N_MF, N_UHF)
-np.save('LAT_default_T_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_T])
-np.save('LAT_default_P_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_Pol])
+#np.save('LAT_default_T_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_T])
+#np.save('LAT_default_P_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_Pol])
 
 
 ####################################################################
@@ -404,12 +404,13 @@ print("beam sizes: "  , Simons_Observatory_V3_SA_beams(), "[arcminute]")
 ## run the code to generate noise curves
 fsky_SAT = 0.1
 sens_mode = 2 #goal sensitivity
-one_over_f_mode_SAT = 1 # optimistic 
+#one_over_f_mode_SAT = 1 # optimistic 
+one_over_f_mode_SAT = 0 # optimistic 
 SAT_yrs_LF = 1
 
 ell, N_ell_SA_Pol, WN_levels = Simons_Observatory_V3_SA_noise(sens_mode, one_over_f_mode_SAT, SAT_yrs_LF, fsky_SAT, 1000, 1)
-np.save('SAT_default_noise_optimistic_mode'+str(sens_mode)+'.npy', [ell, N_ell_SA_Pol])
+np.save('SAT_default_noise_pessimistic_mode'+str(sens_mode)+'.npy', [ell, N_ell_SA_Pol])
  
 sens_mode = 1
 ell, N_ell_SA_Pol, WN_levels = Simons_Observatory_V3_SA_noise(sens_mode, one_over_f_mode_SAT, SAT_yrs_LF, fsky_SAT, 1000, 1)
-np.save('SAT_default_noise_optimistic_mode'+str(sens_mode)+'.npy', [ell, N_ell_SA_Pol])
+np.save('SAT_default_noise_pessimistic_mode'+str(sens_mode)+'.npy', [ell, N_ell_SA_Pol])
