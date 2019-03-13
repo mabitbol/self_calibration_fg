@@ -6,10 +6,10 @@ d2r = np.pi / 180.
 
 class SelfCalibrationSO:
 
-    def __init__(self, fname, low_ell_cut=None):
+    def __init__(self, fname, ell_min_cut=None, ell_max_cut=None):
         self.so_freqs = [ 27.,  39.,  93., 145., 225., 280.]
 
-        self.prepare_cmb_so(fname, low_ell_cut)
+        self.prepare_cmb_so(fname, ell_min_cut, ell_max_cut)
         self.prepare_foregrounds()
         return
 
@@ -60,17 +60,15 @@ class SelfCalibrationSO:
                         Potentially bad! (2)")
         return
 
-    def prepare_cmb_so(self, fname, low_ell_cut):
+    def prepare_cmb_so(self, fname, ell_min_cut, ell_max_cut):
         cmb_cls = ld.load_cmb()
         so_noise = ld.load_SO_noise(fname)
 
-        if low_ell_cut:
-            so_noise = ld.truncate(so_noise, lmin=low_ell_cut, lmax=10000)
-
+        so_noise = ld.truncate(so_noise, lmin=ell_min_cut, lmax=ell_max_cut)
         ellmin = so_noise['ells'].min()
         ellmax = so_noise['ells'].max()
-
         cmb_cls = ld.truncate(cmb_cls, lmin=ellmin, lmax=ellmax)
+
         assert np.all(so_noise['ells'] == cmb_cls['ells'])
 
         self.ells = cmb_cls['ells']
@@ -107,7 +105,6 @@ class SelfCalibrationSO:
         obs['EB'] = 0.5*sin(4*psi)*(cmb['BB']-cmb['EE']+fg['BB']-fg['EE']) + \
                     cos(4*psi)*fg['EB']
         #obs['TB'] = -sin(2*psi)*(cmb['TE']+dust['TE']) + cos(2*psi)*dust['TB']
-        #obs['TB'] = -sin(2*psi)*cmb['TE']
         return obs
 
     def calculate_eb_var(self, obs, noise, fsky=0.1):

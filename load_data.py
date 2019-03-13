@@ -4,6 +4,7 @@ TCMB = 2.725  # Kelvin
 hplanck = 6.626070150e-34  # MKS
 kboltz = 1.380649e-23  # MKS
 
+datadir = '/Users/m/Projects/self_calibration_fg/data/'
 
 def load_SO_noise(fname):
     SO_freqs = [ 27.,  39.,  93., 145., 225., 280.]
@@ -19,7 +20,7 @@ def load_SO_noise(fname):
 
 def load_cmb():
     # data is Dl in uK^2    
-    fdata = np.loadtxt(datadir+'camb_lens_nobb.dat')
+    fdata = np.loadtxt(datadir+'planck1_r0p00_lensedtotCls.dat')
     cmb_cls = {}
     cmb_cls['ells'] = fdata[:, 0]
     cmb_cls['TT'] = fdata[:, 1]
@@ -31,6 +32,10 @@ def load_cmb():
     return cmb_cls
 
 def truncate(data, lmin, lmax):
+    if lmin is None:
+        lmin = 2
+    if lmax is None:
+        lmax = 8000
     mask = (data['ells'] >= lmin) * (data['ells'] <= lmax)
     ndata = {} 
     for ps in data:
