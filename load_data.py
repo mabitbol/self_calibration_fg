@@ -4,13 +4,10 @@ TCMB = 2.725  # Kelvin
 hplanck = 6.626070150e-34  # MKS
 kboltz = 1.380649e-23  # MKS
 
-#datadir = '/Users/abitbol/code/self_calibration_fg/data/'
-datadir = '/Users/m/Projects/self_calibration_fg/data/'
 
-def load_SO_noise():
+def load_SO_noise(fname):
     SO_freqs = [ 27.,  39.,  93., 145., 225., 280.]
-    #fdata = np.load(datadir+'SO_calc_mode2-1_SATyrsLF1_noise_SAT_P.npy', encoding='bytes')
-    fdata = np.load(datadir+'SO_calc_mode2-1_SATyrsLF1_fsky0.1_noise_SAT_P.npy')
+    fdata = np.load(fname)
     SO_ell = fdata[0]
     noise_data = fdata[1]
     unit = SO_ell * (SO_ell + 1.) / (2. * np.pi)
