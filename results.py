@@ -1,47 +1,37 @@
 from self_calibration import SelfCalibrationSO
 
-# mode 1 baseline
-# mode 2 goal
+fnames = ['./data/SAT_default_noise_optimistic_baseline.npy', 
+          './data/SAT_default_noise_optimistic_goal.npy', 
+          './data/SAT_default_noise_pessimistic_baseline.npy', 
+          './data/SAT_default_noise_pessimistic_goal.npy', 
+          './data/SAT_pertube_peryear_noise_optimistic_baseline.npy',
+          './data/SAT_pertube_peryear_noise_optimistic_goal.npy',
+          './data/SAT_pertube_peryear_noise_pessimistic_baseline.npy',
+          './data/SAT_pertube_peryear_noise_pessimistic_goal.npy']
 
-fnames = ['./data/SAT_default_noise_optimistic_mode1.npy', 
-          './data/SAT_default_noise_optimistic_mode2.npy']
+psis_deg = [-2., -1., 0., 1., 2.]
 
 print("SAT")
 for fname in fnames:
     selfcalibration = SelfCalibrationSO(fname)
     print(fname)
-    print("Input \Delta\Psi = 0 degrees")
-    for nu in selfcalibration.so_freqs:
-        selfcalibration.run_self_calibration(0, nu, True, 0.1)
-    print()
+    for psi in psis_deg:
+        print("Input \Delta\Psi = %d degrees" %psi)
+        for nu in selfcalibration.so_freqs:
+            selfcalibration.run_self_calibration(psi, nu, True, fsky=0.1)
+        print()
 
-    print("Input \Delta\Psi = -2 degrees")
-    for nu in selfcalibration.so_freqs:
-        selfcalibration.run_self_calibration(-2, nu, True, 0.1)
-    print()
-
-    print("Input \Delta\Psi = +2 degrees")
-    for nu in selfcalibration.so_freqs:
-        selfcalibration.run_self_calibration(2, nu, True, 0.1)
-    print()
-
-fnames = ['./data/LAT_default_P_noise_mode1.npy',
-          './data/LAT_default_P_noise_mode2.npy']
+fnames = ['./data/LAT_default_P_noise_baseline.npy',
+          './data/LAT_default_P_noise_goal.npy', 
+          './data/LAT_pertube_peryear_P_noise_baseline.npy', 
+          './data/LAT_pertube_peryear_P_noise_goal.npy', 
+    
 print("LAT")
 for fname in fnames:
     selfcalibration = SelfCalibrationSO(fname)
     print(fname)
-    print("Input \Delta\Psi = 0 degrees")
-    for nu in selfcalibration.so_freqs:
-        selfcalibration.run_self_calibration(0, nu, True, 0.4)
-    print()
-
-    print("Input \Delta\Psi = -2 degrees")
-    for nu in selfcalibration.so_freqs:
-        selfcalibration.run_self_calibration(-2, nu, True, 0.4)
-    print()
-
-    print("Input \Delta\Psi = +2 degrees")
-    for nu in selfcalibration.so_freqs:
-        selfcalibration.run_self_calibration(2, nu, True, 0.4)
-    print()
+    for psi in psis_deg:
+        print("Input \Delta\Psi = %d degrees" %psi)
+        for nu in selfcalibration.so_freqs:
+            selfcalibration.run_self_calibration(psi, nu, True, fsky=0.4)
+        print()
