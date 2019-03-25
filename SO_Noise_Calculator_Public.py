@@ -20,7 +20,7 @@ def Simons_Observatory_V3_LA_beams():
     beam_LAT_280 = 0.9
     return(np.array([beam_LAT_27,beam_LAT_39,beam_LAT_93,beam_LAT_145,beam_LAT_225,beam_LAT_280]))
 
-def Simons_Observatory_V3_LA_noise(sensitivity_mode,f_sky,ell_max,delta_ell,N_LF=1.,N_MF=4.,N_UHF=2.):
+def Simons_Observatory_V3_LA_noise(sensitivity_mode, f_sky, ell_max, delta_ell, N_LF=1., N_MF=4., N_UHF=2., survey_time=5.):
     ## returns noise curves in both temperature and polarization, including the impact of the beam, for the SO large aperture telescope
     # sensitivity_mode:
     #     1: baseline, 
@@ -51,20 +51,20 @@ def Simons_Observatory_V3_LA_noise(sensitivity_mode,f_sky,ell_max,delta_ell,N_LF
         S_LA_27 = 1.e9*np.ones(3)
         S_LA_39 = 1.e9*np.ones(3)
     else:
-        S_LA_27  = np.array([1.e9,48.,35.]) * np.sqrt(1./NTubes_LF)  ## converting these to per tube sensitivities
-        S_LA_39  = np.array([1.e9,24.,18.]) * np.sqrt(1./NTubes_LF)
+        S_LA_27  = np.array([1.e9, 48., 35.]) * np.sqrt(1./NTubes_LF)  ## converting these to per tube sensitivities
+        S_LA_39  = np.array([1.e9, 24., 18.]) * np.sqrt(1./NTubes_LF)
     if (NTubes_MF == 0.):
         S_LA_93 = 1.e9*np.ones(3)
         S_LA_145 = 1.e9*np.ones(3)
     else:
-        S_LA_93  = np.array([1.e9,5.4,3.9]) * np.sqrt(4./NTubes_MF) 
-        S_LA_145 = np.array([1.e9,6.7,4.2]) * np.sqrt(4./NTubes_MF) 
+        S_LA_93  = np.array([1.e9, 5.4, 3.9]) * np.sqrt(4./NTubes_MF) 
+        S_LA_145 = np.array([1.e9, 6.7, 4.2]) * np.sqrt(4./NTubes_MF) 
     if (NTubes_UHF == 0.):
         S_LA_225 = 1.e9*np.ones(3)
         S_LA_280 = 1.e9*np.ones(3)
     else:
-        S_LA_225 = np.array([1.e9,15.,10.]) * np.sqrt(2./NTubes_UHF) 
-        S_LA_280 = np.array([1.e9,36.,25.]) * np.sqrt(2./NTubes_UHF)
+        S_LA_225 = np.array([1.e9, 15., 10.]) * np.sqrt(2./NTubes_UHF) 
+        S_LA_280 = np.array([1.e9, 36., 25.]) * np.sqrt(2./NTubes_UHF)
     # 1/f polarization noise -- see Sec. 2.2 of SO science goals paper
     f_knee_pol_LA_27 = 700.
     f_knee_pol_LA_39 = 700.
@@ -84,7 +84,7 @@ def Simons_Observatory_V3_LA_noise(sensitivity_mode,f_sky,ell_max,delta_ell,N_LF
     
     ####################################################################
     ## calculate the survey area and time
-    survey_time = 5. #years
+    #survey_time = 5. #years
     t = survey_time * 365.25 * 24. * 3600.    ## convert years to seconds
     t = t * 0.2   ## retention after observing efficiency and cuts
     t = t * 0.85  ## a kludge for the noise non-uniformity of the map edges
@@ -234,21 +234,22 @@ beams = Simons_Observatory_V3_LA_beams()
 beams_sigma_rad = beams / np.sqrt(8. * np.log(2)) /60. * np.pi/180.
 
 ## run the code to generate noise curves
-mode=2 # goal sensitivity
-fsky=0.4
-N_LF=1.
-N_MF=4.
-N_UHF=2.
-ellmax=1e4
+fsky = 0.4
+N_LF = 1.
+N_MF = 1.
+N_UHF = 1.
+ellmax = 1e4
+survey_time = 1.
 
-ell, N_ell_LA_T, N_ell_LA_Pol, WN_levels = Simons_Observatory_V3_LA_noise(mode, fsky, ellmax, 1, N_LF, N_MF, N_UHF)
-#np.save('LAT_default_T_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_T])
-#np.save('LAT_default_P_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_Pol])
+mode = 2 # goal sensitivity
+ell, N_ell_LA_T, N_ell_LA_Pol, WN_levels = Simons_Observatory_V3_LA_noise(mode, fsky, ellmax, 1, N_LF, N_MF, N_UHF, survey_time)
+np.save('LAT_pertube_peryear_T_noise_goal.npy', [ell, N_ell_LA_T])
+np.save('LAT_pertube_peryear_P_noise_goal.npy', [ell, N_ell_LA_Pol])
 
-mode=1 # goal sensitivity
+mode = 1 # baseline sensitivity
 ell, N_ell_LA_T, N_ell_LA_Pol, WN_levels = Simons_Observatory_V3_LA_noise(mode, fsky, ellmax, 1, N_LF, N_MF, N_UHF)
-#np.save('LAT_default_T_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_T])
-#np.save('LAT_default_P_noise_mode'+str(mode)+'.npy', [ell, N_ell_LA_Pol])
+np.save('LAT_pertube_peryear_T_noise_baseline.npy', [ell, N_ell_LA_T])
+np.save('LAT_pertube_peryear_P_noise_baseline.npy', [ell, N_ell_LA_Pol])
 
 
 ####################################################################
@@ -271,7 +272,7 @@ def Simons_Observatory_V3_SA_beams():
     beam_SAT_280 = 9.
     return(np.array([beam_SAT_27,beam_SAT_39,beam_SAT_93,beam_SAT_145,beam_SAT_225,beam_SAT_280]))
 
-def Simons_Observatory_V3_SA_noise(sensitivity_mode,one_over_f_mode,SAT_yrs_LF,f_sky,ell_max,delta_ell):
+def Simons_Observatory_V3_SA_noise(sensitivity_mode, one_over_f_mode, SAT_yrs_LF, f_sky, ell_max, delta_ell):
     ## returns noise curves in polarization only, including the impact of the beam, for the SO small aperture telescopes
     ## noise curves are polarization only
     # sensitivity_mode
@@ -303,6 +304,10 @@ def Simons_Observatory_V3_SA_noise(sensitivity_mode,one_over_f_mode,SAT_yrs_LF,f
         NTubes_LF  = np.fabs(SAT_yrs_LF)/5. + 1e-6  ## regularized in case zero years is called
         NTubes_MF  = 2 
     NTubes_UHF = 1.
+
+    NTubes_LF = 1.
+    NTubes_MF = 1.
+
     # sensitivity
     # N.B. divide-by-zero will occur if NTubes = 0
     # handle with assert() since it's highly unlikely we want any configurations without >= 1 of each tube type
@@ -327,7 +332,8 @@ def Simons_Observatory_V3_SA_noise(sensitivity_mode,one_over_f_mode,SAT_yrs_LF,f
     
     ####################################################################
     ## calculate the survey area and time
-    t = 5* 365. * 24. * 3600    ## five years in seconds
+    t = 1 * 365. * 24. * 3600    ## five years in seconds
+    #t = 5 * 365. * 24. * 3600    ## five years in seconds
     t = t * 0.2  ## retention after observing efficiency and cuts
     t = t* 0.85  ## a kludge for the noise non-uniformity of the map edges
     A_SR = 4 * np.pi * f_sky  ## sky area in steradians
@@ -403,14 +409,26 @@ print("beam sizes: "  , Simons_Observatory_V3_SA_beams(), "[arcminute]")
 
 ## run the code to generate noise curves
 fsky_SAT = 0.1
-sens_mode = 2 #goal sensitivity
-#one_over_f_mode_SAT = 1 # optimistic 
-one_over_f_mode_SAT = 0 # optimistic 
 SAT_yrs_LF = 1
 
+one_over_f_mode_SAT = 0 # pessimistic
+sens_mode = 1 #baseline
 ell, N_ell_SA_Pol, WN_levels = Simons_Observatory_V3_SA_noise(sens_mode, one_over_f_mode_SAT, SAT_yrs_LF, fsky_SAT, 1000, 1)
-np.save('SAT_default_noise_pessimistic_mode'+str(sens_mode)+'.npy', [ell, N_ell_SA_Pol])
+np.save('SAT_pertube_peryear_noise_pessimistic_baseline.npy', [ell, N_ell_SA_Pol])
+
+sens_mode = 2 #goal sensitivity
+ell, N_ell_SA_Pol, WN_levels = Simons_Observatory_V3_SA_noise(sens_mode, one_over_f_mode_SAT, SAT_yrs_LF, fsky_SAT, 1000, 1)
+np.save('SAT_pertube_peryear_noise_pessimistic_gaol.npy', [ell, N_ell_SA_Pol])
  
-sens_mode = 1
+
+one_over_f_mode_SAT = 1 # optimistic 
+sens_mode = 1 #baseline
 ell, N_ell_SA_Pol, WN_levels = Simons_Observatory_V3_SA_noise(sens_mode, one_over_f_mode_SAT, SAT_yrs_LF, fsky_SAT, 1000, 1)
-np.save('SAT_default_noise_pessimistic_mode'+str(sens_mode)+'.npy', [ell, N_ell_SA_Pol])
+np.save('SAT_pertube_peryear_noise_optimistic_baseline.npy', [ell, N_ell_SA_Pol])
+
+sens_mode = 2 #goal sensitivity
+ell, N_ell_SA_Pol, WN_levels = Simons_Observatory_V3_SA_noise(sens_mode, one_over_f_mode_SAT, SAT_yrs_LF, fsky_SAT, 1000, 1)
+np.save('SAT_pertube_peryear_noise_optimistic_goal.npy', [ell, N_ell_SA_Pol])
+ 
+
+
