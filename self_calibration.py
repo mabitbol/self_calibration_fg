@@ -21,11 +21,11 @@ class SelfCalibrationSO:
         self.calculate_eb_lnlike(observed_cls, eb_var)
         self.get_bias_sigma()
 
+        bias = float("%0.2f" %(self.bias/d2r - psi0_deg))
+        sigma = float("%0.2f" %(self.sigma/d2r))
         if doprint:
-            bias = float("%0.3f" %(self.bias/d2r - psi0_deg))
-            sigma = float("%0.3f" %(self.sigma/d2r))
             print("%d GHz: bias=%0.3f, sigma=%0.3f" %(nu, bias, sigma))
-        return
+        return bias, sigma
 
     def calculate_eb_lnlike(self, obs, eb_var):
         eb_lnlike = []
@@ -78,7 +78,7 @@ class SelfCalibrationSO:
 
     def prepare_foregrounds(self):
         self.dust_353 = ld.load_dust(self.ells)
-        self.synch_spass = ld.load_synch(self.ells)
+        self.synch_spass = ld.load_synch(self.ells, EB_frac=0.1)
 
         self.dust_scaling = {}
         self.synch_scaling = {}

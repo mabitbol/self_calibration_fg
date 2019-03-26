@@ -241,15 +241,16 @@ N_UHF = 1.
 ellmax = 1e4
 survey_time = 1.
 
+mode = 1 # baseline sensitivity
+ell, N_ell_LA_T, N_ell_LA_Pol, WN_levels = Simons_Observatory_V3_LA_noise(mode, fsky, ellmax, 1, N_LF, N_MF, N_UHF, survey_time)
+np.save('LAT_pertube_peryear_T_noise_baseline.npy', [ell, N_ell_LA_T])
+np.save('LAT_pertube_peryear_P_noise_baseline.npy', [ell, N_ell_LA_Pol])
+
 mode = 2 # goal sensitivity
 ell, N_ell_LA_T, N_ell_LA_Pol, WN_levels = Simons_Observatory_V3_LA_noise(mode, fsky, ellmax, 1, N_LF, N_MF, N_UHF, survey_time)
 np.save('LAT_pertube_peryear_T_noise_goal.npy', [ell, N_ell_LA_T])
 np.save('LAT_pertube_peryear_P_noise_goal.npy', [ell, N_ell_LA_Pol])
 
-mode = 1 # baseline sensitivity
-ell, N_ell_LA_T, N_ell_LA_Pol, WN_levels = Simons_Observatory_V3_LA_noise(mode, fsky, ellmax, 1, N_LF, N_MF, N_UHF)
-np.save('LAT_pertube_peryear_T_noise_baseline.npy', [ell, N_ell_LA_T])
-np.save('LAT_pertube_peryear_P_noise_baseline.npy', [ell, N_ell_LA_Pol])
 
 
 ####################################################################
@@ -418,7 +419,7 @@ np.save('SAT_pertube_peryear_noise_pessimistic_baseline.npy', [ell, N_ell_SA_Pol
 
 sens_mode = 2 #goal sensitivity
 ell, N_ell_SA_Pol, WN_levels = Simons_Observatory_V3_SA_noise(sens_mode, one_over_f_mode_SAT, SAT_yrs_LF, fsky_SAT, 1000, 1)
-np.save('SAT_pertube_peryear_noise_pessimistic_gaol.npy', [ell, N_ell_SA_Pol])
+np.save('SAT_pertube_peryear_noise_pessimistic_goal.npy', [ell, N_ell_SA_Pol])
  
 
 one_over_f_mode_SAT = 1 # optimistic 
