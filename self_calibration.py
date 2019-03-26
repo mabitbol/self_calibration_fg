@@ -78,7 +78,7 @@ class SelfCalibrationSO:
 
     def prepare_foregrounds(self):
         self.dust_353 = ld.load_dust(self.ells)
-        self.synch_spass = ld.load_synch(self.ells, EB_frac=0.1)
+        self.synch_spass = ld.load_synch(self.ells)
 
         self.dust_scaling = {}
         self.synch_scaling = {}
