@@ -4,7 +4,7 @@ TCMB = 2.725  # Kelvin
 hplanck = 6.626070150e-34  # MKS
 kboltz = 1.380649e-23  # MKS
 
-datadir = '/Users/m/Projects/self_calibration_fg/data/'
+datadir = './data/'
 
 def load_SO_noise(fname):
     SO_freqs = [ 27.,  39.,  93., 145., 225., 280.]
